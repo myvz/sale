@@ -1,4 +1,4 @@
-# springboot-sample-app
+# ReadingIsGood Sale
 
 For building and running the application you need:
 
@@ -14,3 +14,20 @@ Alternatively you can use the [Spring Boot Maven plugin](https://docs.spring.io/
 ```shell
 mvn spring-boot:run
 ```
+
+## Building a Docker Image
+
+Sale service use jib maven plugin in order to create docker images
+
+You can see its documentation https://github.com/GoogleContainerTools/jib
+
+```shell
+mvn clean install
+```
+
+## Securing Sale Api Services
+
+Sale service secures api services using signature verified jwt token. You can set signature key by setting ${security.jwt.secret} property.
+In tests, you can use already generated for John Doer jwt : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc3MiOiJSZWFkaW5nSXNHb29kIn0.7UqcWUkjxSHgnAVf8lPBnPTs6HHUQEVGi9OWVUUvcaA
+
+You can see its documentation hhttps://jwt.io/
