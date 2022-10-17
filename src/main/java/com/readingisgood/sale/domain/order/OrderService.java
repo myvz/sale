@@ -30,16 +30,14 @@ public class OrderService {
 
 
     @Transactional
-    public OrderDetail order(CreteOrder createOrder) {
+    public Order order(CreteOrder createOrder) {
         if (isOutOffStockAnyItem(createOrder)) {
             throw new OutOfStockException();
         }
         Order order = createOrder(createOrder);
         List<OrderLine> orderLines = createOrderLines(createOrder, order);
-        return OrderDetail.builder()
-                .order(order)
-                .orderLines(orderLines)
-                .build();
+        order.setOrderLines(orderLines);
+        return order;
     }
 
     private boolean isOutOffStockAnyItem(CreteOrder createOrder) {
@@ -70,27 +68,11 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<OrderDetail> getOrder(Long orderId) {
-        return orderRepository.findById(orderId)
-                .map(order -> {
-                    List<OrderLine> orderLines = orderLineRepository.findByOrder(order);
-                    return OrderDetail.builder()
-                            .order(order)
-                            .orderLines(orderLines)
-                            .build();
-                });
+    public Optional<Order> getOrder(Long orderId) {
+        return orderRepository.findById(orderId);
     }
 
-    public List<OrderDetail> getOrder(LocalDateTime startDate, LocalDateTime endDate) {
-        return orderLineRepository.findByOrder_CreatedDateBetween(startDate, endDate)
-                .stream()
-                .collect(Collectors.groupingBy(OrderLine::getOrder))
-                .entrySet()
-                .stream()
-                .map(e -> OrderDetail.builder()
-                        .order(e.getKey())
-                        .orderLines(e.getValue())
-                        .build())
-                .collect(Collectors.toList());
+    public List<Order> getOrder(LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findByCreatedDateBetween(startDate, endDate);
     }
 }

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readingisgood.sale.api.security.JJWTAuthenticationFilterConfiguration;
 import com.readingisgood.sale.api.security.JwtConfiguration;
 import com.readingisgood.sale.domain.book.Book;
-import com.readingisgood.sale.domain.book.BookRepository;
 import com.readingisgood.sale.domain.customer.Customer;
-import com.readingisgood.sale.domain.customer.CustomerRepository;
-import com.readingisgood.sale.domain.order.*;
+import com.readingisgood.sale.domain.order.Order;
+import com.readingisgood.sale.domain.order.OrderLine;
+import com.readingisgood.sale.domain.order.OrderService;
+import com.readingisgood.sale.domain.order.OutOfStockException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -65,24 +66,17 @@ class OrderControllerTest {
         Order order = Order.builder()
                 .id(989L)
                 .customer(Customer.builder().id(customerId).build())
-                .build();
-
-        OrderDetail orderDetail = OrderDetail.builder()
-                .order(order)
-                .orderLine(OrderLine.builder()
+                .orderLines(List.of(OrderLine.builder()
                         .id(11L)
-                        .order(order)
                         .book(Book.builder().id(23L).build())
-                        .build())
-                .orderLine(OrderLine.builder()
+                        .build(), OrderLine.builder()
                         .id(12L)
-                        .order(order)
                         .book(Book.builder().id(24L).build())
                         .build())
+                )
                 .build();
 
-
-        when(orderService.order(orderMapper.mapToCreateOrder(orderRequest))).thenReturn(orderDetail);
+        when(orderService.order(orderMapper.mapToCreateOrder(orderRequest))).thenReturn(order);
 
         mockMvc.perform(post("/order")
                         .header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc3MiOiJSZWFkaW5nSXNHb29kIn0.7UqcWUkjxSHgnAVf8lPBnPTs6HHUQEVGi9OWVUUvcaA")
@@ -131,23 +125,17 @@ class OrderControllerTest {
         Order order = Order.builder()
                 .id(989L)
                 .customer(Customer.builder().id(customerId).build())
-                .build();
-
-        OrderDetail orderDetail = OrderDetail.builder()
-                .order(order)
-                .orderLine(OrderLine.builder()
+                .orderLines(List.of(OrderLine.builder()
                         .id(11L)
-                        .order(order)
                         .book(Book.builder().id(23L).build())
-                        .build())
-                .orderLine(OrderLine.builder()
+                        .build(), OrderLine.builder()
                         .id(12L)
-                        .order(order)
                         .book(Book.builder().id(24L).build())
                         .build())
+                )
                 .build();
 
-        when(orderService.getOrder(orderId)).thenReturn(Optional.of(orderDetail));
+        when(orderService.getOrder(orderId)).thenReturn(Optional.of(order));
 
         mockMvc.perform(get("/order/{orderId}", orderId)
                         .header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc3MiOiJSZWFkaW5nSXNHb29kIn0.7UqcWUkjxSHgnAVf8lPBnPTs6HHUQEVGi9OWVUUvcaA")
@@ -183,30 +171,25 @@ class OrderControllerTest {
         Order order = Order.builder()
                 .id(989L)
                 .customer(Customer.builder().id(customerId).build())
-                .build();
-
-        OrderDetail orderDetail = OrderDetail.builder()
-                .order(order)
-                .orderLine(OrderLine.builder()
+                .orderLines(List.of(OrderLine.builder()
                         .id(11L)
-                        .order(order)
                         .book(Book.builder().id(23L).build())
-                        .build())
-                .orderLine(OrderLine.builder()
+                        .build(), OrderLine.builder()
                         .id(12L)
-                        .order(order)
                         .book(Book.builder().id(24L).build())
                         .build())
+                )
                 .build();
 
         LocalDateTime startDate = LocalDateTime.now().minusDays(1).truncatedTo(ChronoUnit.SECONDS);
-        LocalDateTime endDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);;
+        LocalDateTime endDate = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        ;
 
-        when(orderService.getOrder(startDate,endDate)).thenReturn(List.of(orderDetail));
+        when(orderService.getOrder(startDate, endDate)).thenReturn(List.of(order));
 
         mockMvc.perform(get("/order", orderId)
-                        .param("startDate",String.valueOf(startDate.atZone(ZoneId.systemDefault()).toEpochSecond()))
-                        .param("endDate",String.valueOf(endDate.atZone(ZoneId.systemDefault()).toEpochSecond()))
+                        .param("startDate", String.valueOf(startDate.atZone(ZoneId.systemDefault()).toEpochSecond()))
+                        .param("endDate", String.valueOf(endDate.atZone(ZoneId.systemDefault()).toEpochSecond()))
                         .header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc3MiOiJSZWFkaW5nSXNHb29kIn0.7UqcWUkjxSHgnAVf8lPBnPTs6HHUQEVGi9OWVUUvcaA")
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())

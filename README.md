@@ -15,6 +15,15 @@ Alternatively you can use the [Spring Boot Maven plugin](https://docs.spring.io/
 mvn spring-boot:run
 ```
 
+## Testing Sample Requests
+
+There are POSTMAN request samples on the repo. You can easily test sale api services.
+
+Please see file --> readingisgood.postman_collection.json
+```shell
+mvn spring-boot:run
+```
+
 ## Building a Docker Image
 
 Sale service use jib maven plugin in order to create docker images

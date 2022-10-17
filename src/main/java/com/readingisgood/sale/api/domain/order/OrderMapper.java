@@ -1,7 +1,7 @@
 package com.readingisgood.sale.api.domain.order;
 
 import com.readingisgood.sale.domain.order.CreteOrder;
-import com.readingisgood.sale.domain.order.OrderDetail;
+import com.readingisgood.sale.domain.order.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
@@ -24,12 +24,12 @@ public class OrderMapper {
                 .build();
     }
 
-    public OrderDetailResponse mapToOrderResponse(OrderDetail orderDetail) {
+    public OrderDetailResponse mapToOrderResponse(Order order) {
         return OrderDetailResponse.builder()
-                .order(OrderResponse.builder().orderId(orderDetail.getOrder().getId())
-                        .customerId(orderDetail.getOrder().getCustomer().getId())
+                .order(OrderResponse.builder().orderId(order.getId())
+                        .customerId(order.getCustomer().getId())
                         .build())
-                .orderLines(orderDetail.getOrderLines()
+                .orderLines(order.getOrderLines()
                         .stream().map(ol -> OrderLineResponse.builder()
                                 .orderLineId(ol.getId())
                                 .bookId(ol.getBook().getId())

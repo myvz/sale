@@ -4,12 +4,10 @@ import com.readingisgood.sale.domain.book.Book;
 import com.readingisgood.sale.domain.book.BookRepository;
 import com.readingisgood.sale.domain.customer.Customer;
 import com.readingisgood.sale.domain.customer.CustomerRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
@@ -69,19 +67,19 @@ class OrderServiceTest {
         when(bookRepository.getReferenceById(24L)).thenReturn(book24);
 
         //when
-        OrderDetail orderDetail = orderService.order(creteOrder);
+        Order order = orderService.order(creteOrder);
 
 
         //Then
-        assertThat(orderDetail.getOrder().getCustomer()).isEqualTo(customer);
-        assertThat(orderDetail.getOrderLines().size()).isEqualTo(2);
-        assertThat(orderDetail.getOrderLines()).anySatisfy(ol -> {
-            assertThat(ol.getOrder()).isEqualTo(orderDetail.getOrder());
+        assertThat(order.getCustomer()).isEqualTo(customer);
+        assertThat(order.getOrderLines().size()).isEqualTo(2);
+        assertThat(order.getOrderLines()).anySatisfy(ol -> {
+            assertThat(ol.getOrder()).isEqualTo(order);
             assertThat(ol.getBook()).isEqualTo(book23);
             assertThat(ol.getQuantity()).isEqualTo(3L);
         });
-        assertThat(orderDetail.getOrderLines()).anySatisfy(ol -> {
-            assertThat(ol.getOrder()).isEqualTo(orderDetail.getOrder());
+        assertThat(order.getOrderLines()).anySatisfy(ol -> {
+            assertThat(ol.getOrder()).isEqualTo(order);
             assertThat(ol.getBook()).isEqualTo(book24);
             assertThat(ol.getQuantity()).isEqualTo(1L);
         });
@@ -117,16 +115,12 @@ class OrderServiceTest {
         Order order = new Order();
         when(orderRepository.findById(97L)).thenReturn(Optional.of(order));
 
-        OrderLine orderLine = new OrderLine();
-        when(orderLineRepository.findByOrder(order)).thenReturn(List.of(orderLine));
-
         //when
-        Optional<OrderDetail> result = orderService.getOrder(orderId);
+        Optional<Order> result = orderService.getOrder(orderId);
 
         //then
-        assertThat(result).hasValueSatisfying(orderDetail -> {
-                    assertThat(orderDetail.getOrder()).isEqualTo(order);
-                    assertThat(orderDetail.getOrderLines()).containsExactly(orderLine);
+        assertThat(result).hasValueSatisfying(order1 -> {
+                    assertThat(order1).isEqualTo(order);
                 }
         );
     }
@@ -141,14 +135,15 @@ class OrderServiceTest {
                 .order(order).build();
         OrderLine orderLine2 = OrderLine.builder()
                 .order(order).build();
-        when(orderLineRepository.findByOrder_CreatedDateBetween(startDate, endDate)).thenReturn(List.of(orderLine,orderLine2));
+        order.setOrderLines(List.of(orderLine, orderLine2));
+        when(orderRepository.findByCreatedDateBetween(startDate, endDate)).thenReturn(List.of(order));
 
         //when
-        List<OrderDetail> orderDetails = orderService.getOrder(startDate, endDate);
+        List<Order> orderDetails = orderService.getOrder(startDate, endDate);
 
         //then
         assertThat(orderDetails.size()).isEqualTo(1);
-        assertThat(orderDetails.get(0).getOrder()).isEqualTo(order);
+        assertThat(orderDetails.get(0)).isEqualTo(order);
         assertThat(orderDetails.get(0).getOrderLines()).containsExactly(orderLine, orderLine2);
     }
 }

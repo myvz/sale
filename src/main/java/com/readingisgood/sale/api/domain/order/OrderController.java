@@ -1,6 +1,6 @@
 package com.readingisgood.sale.api.domain.order;
 
-import com.readingisgood.sale.domain.order.OrderDetail;
+import com.readingisgood.sale.domain.order.Order;
 import com.readingisgood.sale.domain.order.OrderService;
 import com.readingisgood.sale.domain.util.DateUtil;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderDetailResponse createOrder(@RequestBody @Validated OrderRequest orderRequest) {
-        OrderDetail order = orderService.order(orderMapper.mapToCreateOrder(orderRequest));
+        Order order = orderService.order(orderMapper.mapToCreateOrder(orderRequest));
         return orderMapper.mapToOrderResponse(order);
     }
 
