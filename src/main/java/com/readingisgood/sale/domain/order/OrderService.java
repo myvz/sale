@@ -1,6 +1,7 @@
 package com.readingisgood.sale.domain.order;
 
 import com.readingisgood.sale.domain.book.BookRepository;
+import com.readingisgood.sale.domain.customer.CustomerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +16,16 @@ public class OrderService {
     private final BookRepository bookRepository;
     private final OrderRepository orderRepository;
     private final OrderLineRepository orderLineRepository;
-    private final OrderCreateMapper orderCreateMapper;
+    private final CustomerRepository customerRepository;
 
     public OrderService(BookRepository bookRepository,
                         OrderRepository orderRepository,
                         OrderLineRepository orderLineRepository,
-                        OrderCreateMapper orderCreateMapper) {
+                        CustomerRepository customerRepository) {
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
         this.orderLineRepository = orderLineRepository;
-        this.orderCreateMapper = orderCreateMapper;
+        this.customerRepository = customerRepository;
     }
 
 
@@ -48,11 +49,25 @@ public class OrderService {
     }
 
     private Order createOrder(CreteOrder createOrder) {
-        return orderRepository.save(orderCreateMapper.mapToOrder(createOrder));
+        return orderRepository.save(mapToOrder(createOrder));
     }
 
     private List<OrderLine> createOrderLines(CreteOrder createOrder, Order order) {
-        return orderLineRepository.saveAll(orderCreateMapper.mapToOrderLines(createOrder, order));
+        return orderLineRepository.saveAll(mapToOrderLines(createOrder, order));
+    }
+
+    private Order mapToOrder(CreteOrder creteOrder) {
+        return Order.builder().customer(customerRepository.getReferenceById(creteOrder.getCustomerId())).build();
+    }
+
+    private List<OrderLine> mapToOrderLines(CreteOrder creteOrder, Order order) {
+        return creteOrder.getOrderLines().stream()
+                .map(orderLine -> OrderLine.builder()
+                        .book(bookRepository.getReferenceById(orderLine.getBookId()))
+                        .quantity(orderLine.getQuantity())
+                        .order(order)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public Optional<OrderDetail> getOrder(Long orderId) {

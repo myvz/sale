@@ -6,7 +6,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
-import static com.readingisgood.sale.api.domain.order.OrderDetailResponse.*;
+import static com.readingisgood.sale.api.domain.order.OrderDetailResponse.OrderLineResponse;
+import static com.readingisgood.sale.api.domain.order.OrderDetailResponse.OrderResponse;
 
 @Component
 public class OrderMapper {

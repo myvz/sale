@@ -49,11 +49,11 @@ public class Book extends BaseAuditingEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return ISBN.equals(book.ISBN);
+        return Objects.equals(id, book.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ISBN);
+        return Objects.hash(id);
     }
 }

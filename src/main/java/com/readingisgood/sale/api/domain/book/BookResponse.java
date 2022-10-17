@@ -8,7 +8,8 @@ import java.math.BigDecimal;
 
 @Value
 @Builder
-public class NewBookResponse {
+public class BookResponse {
+    Long id;
     String name;
     String author;
     String genre;

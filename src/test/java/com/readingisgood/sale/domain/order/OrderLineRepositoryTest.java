@@ -2,7 +2,6 @@ package com.readingisgood.sale.domain.order;
 
 import com.readingisgood.sale.domain.book.Book;
 import com.readingisgood.sale.domain.customer.Customer;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -10,9 +9,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @EnableJpaAuditing
@@ -40,8 +40,8 @@ class OrderLineRepositoryTest {
 
         List<OrderLine> result = orderLineRepository.findByOrder(order);
 
-        Assertions.assertThat(result.size()).isEqualTo(2);
-        Assertions.assertThat(result).contains(orderLine, orderLine2);
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).contains(orderLine, orderLine2);
     }
 
 
@@ -62,8 +62,35 @@ class OrderLineRepositoryTest {
         List<OrderLine> result = orderLineRepository.findByOrder_CreatedDateBetween(LocalDateTime.now()
                 .minusDays(1), LocalDateTime.now());
 
-        Assertions.assertThat(result.size()).isEqualTo(2);
-        Assertions.assertThat(result).contains(orderLine, orderLine2);
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).contains(orderLine, orderLine2);
+    }
+
+    @Test
+    void it_should_get_montlhy_customer_order_stats() {
+
+        Customer customer = createCustomer();
+
+        Book book = createBook("Robert Martin", "Clean Code", "Software Design", 1000L, BigDecimal.valueOf(136), "978 - 1 - 56619 - 909 - 4");
+        Book book2 = createBook("Robert Martin", "The Clean Coder", "Software Design", 1000L, BigDecimal.valueOf(230), "978-1-56619-909-4");
+
+        Order order = createOrder(customer);
+        OrderLine orderLine = createOrderLine(book, order, 2);
+        OrderLine orderLine2 = createOrderLine(book2, order, 3);
+
+        Order order2 = createOrder(customer);
+        OrderLine orderLine3 = createOrderLine(book, order2, 2);
+        OrderLine orderLine4 = createOrderLine(book2, order2, 3);
+
+        testEntityManager.clear();
+
+        List<MonthlyCustomerOrderStatsView> result = orderLineRepository.findMonthlyCustomerOrderStatsByCustomerId(customer.getId());
+
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getMonth()).isEqualTo(orderLine.getCreatedDate().getMonth().getValue());
+        assertThat(result.get(0).getTotalOrderCount()).isEqualTo(2);
+        assertThat(result.get(0).getTotalBookCount()).isEqualTo(10);
+        assertThat(result.get(0).getTotalPurchasedAmount()).isEqualByComparingTo(BigDecimal.valueOf(1924));
     }
 
     private OrderLine createOrderLine(Book book, Order order, int quantity) {
@@ -100,4 +127,5 @@ class OrderLineRepositoryTest {
                 .build();
         return testEntityManager.persistAndFlush(customer);
     }
+
 }

@@ -1,6 +1,10 @@
 package com.readingisgood.sale.domain.order;
 
+import com.readingisgood.sale.domain.book.Book;
 import com.readingisgood.sale.domain.book.BookRepository;
+import com.readingisgood.sale.domain.customer.Customer;
+import com.readingisgood.sale.domain.customer.CustomerRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +13,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,14 +30,14 @@ class OrderServiceTest {
     @Mock
     BookRepository bookRepository;
 
-    @Spy
-    OrderCreateMapper orderCreateMapper = new OrderCreateMapper();
-
     @Mock
     OrderRepository orderRepository;
 
     @Mock
     OrderLineRepository orderLineRepository;
+
+    @Mock
+    CustomerRepository customerRepository;
 
     @Test
     void it_should_create_order_when_stocks_are_available() {
@@ -58,21 +61,28 @@ class OrderServiceTest {
         when(orderRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
         when(orderLineRepository.saveAll(any())).thenAnswer(i -> i.getArguments()[0]);
 
+        Customer customer = new Customer();
+        when(customerRepository.getReferenceById(customerId)).thenReturn(customer);
+        Book book23 = new Book();
+        Book book24 = new Book();
+        when(bookRepository.getReferenceById(23L)).thenReturn(book23);
+        when(bookRepository.getReferenceById(24L)).thenReturn(book24);
+
         //when
         OrderDetail orderDetail = orderService.order(creteOrder);
 
 
         //Then
-        assertThat(orderDetail.getOrder().getCustomer().getId()).isEqualTo(customerId);
+        assertThat(orderDetail.getOrder().getCustomer()).isEqualTo(customer);
         assertThat(orderDetail.getOrderLines().size()).isEqualTo(2);
         assertThat(orderDetail.getOrderLines()).anySatisfy(ol -> {
             assertThat(ol.getOrder()).isEqualTo(orderDetail.getOrder());
-            assertThat(ol.getBook().getId()).isEqualTo(23L);
+            assertThat(ol.getBook()).isEqualTo(book23);
             assertThat(ol.getQuantity()).isEqualTo(3L);
         });
         assertThat(orderDetail.getOrderLines()).anySatisfy(ol -> {
             assertThat(ol.getOrder()).isEqualTo(orderDetail.getOrder());
-            assertThat(ol.getBook().getId()).isEqualTo(24L);
+            assertThat(ol.getBook()).isEqualTo(book24);
             assertThat(ol.getQuantity()).isEqualTo(1L);
         });
     }

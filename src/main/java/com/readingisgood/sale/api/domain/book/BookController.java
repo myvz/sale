@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/book")
 public class BookController {
@@ -20,13 +22,19 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public NewBookResponse createNewBook(@Validated @RequestBody NewBookRequest newBookRequest) {
+    public BookResponse createNewBook(@Validated @RequestBody NewBookRequest newBookRequest) {
         Book newBook = bookService.createNewBook(bookMapper.mapToBook(newBookRequest));
         return bookMapper.mapToBookResponse(newBook);
     }
 
+    @GetMapping
+    public List<BookResponse> listAllBooks() {
+        List<Book> allBooks = bookService.getAllBooks();
+        return bookMapper.mapToBookResponse(allBooks);
+    }
+
     @PatchMapping("/{bookId}")
-    public NewBookResponse updateBook(@PathVariable("bookId") Long bookId, @Validated @RequestBody BookUpdateRequest bookUpdateRequest) {
+    public BookResponse updateBook(@PathVariable("bookId") Long bookId, @Validated @RequestBody BookUpdateRequest bookUpdateRequest) {
         Book book = bookService.updateBook(bookId, bookMapper.mapToBookUpdateDto(bookUpdateRequest));
         return bookMapper.mapToBookResponse(book);
     }

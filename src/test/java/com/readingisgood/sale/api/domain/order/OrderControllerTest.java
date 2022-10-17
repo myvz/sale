@@ -1,13 +1,12 @@
 package com.readingisgood.sale.api.domain.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.readingisgood.sale.api.domain.book.BookMapper;
-import com.readingisgood.sale.api.domain.customer.CustomerController;
 import com.readingisgood.sale.api.security.JJWTAuthenticationFilterConfiguration;
 import com.readingisgood.sale.api.security.JwtConfiguration;
 import com.readingisgood.sale.domain.book.Book;
-import com.readingisgood.sale.domain.book.BookService;
+import com.readingisgood.sale.domain.book.BookRepository;
 import com.readingisgood.sale.domain.customer.Customer;
+import com.readingisgood.sale.domain.customer.CustomerRepository;
 import com.readingisgood.sale.domain.order.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,9 +40,6 @@ class OrderControllerTest {
 
     @SpyBean
     OrderMapper orderMapper;
-
-    @SpyBean
-    OrderCreateMapper orderCreateMapper;
 
     @MockBean
     OrderService orderService;

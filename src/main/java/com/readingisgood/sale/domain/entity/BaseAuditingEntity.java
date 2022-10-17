@@ -19,6 +19,16 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public abstract class BaseAuditingEntity {
 
+    public BaseAuditingEntity(LocalDateTime createdDate, LocalDateTime modifiedDate, Long createdBy, Long lastModifiedBy) {
+        this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public BaseAuditingEntity() {
+    }
+
     @Column(name = "created_date", nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdDate;

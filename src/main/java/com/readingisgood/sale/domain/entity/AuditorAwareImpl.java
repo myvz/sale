@@ -3,7 +3,6 @@ package com.readingisgood.sale.domain.entity;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 

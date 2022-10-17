@@ -6,6 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class CustomerRegisterResponse {
+    Long id;
     String email;
     String name;
     String lastName;

@@ -40,7 +40,8 @@ class BookControllerTest {
 
     @Test
     void createNewBook() throws Exception {
-        NewBookRequest request = NewBookRequest.builder().ISBN("978-1-56619-909-4")
+        NewBookRequest request = NewBookRequest.builder()
+                .ISBN("978-1-56619-909-4")
                 .author("9780132350884")
                 .name("Robert Martin")
                 .genre("Software Design")

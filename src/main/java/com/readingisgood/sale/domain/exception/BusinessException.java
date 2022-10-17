@@ -1,6 +1,7 @@
 package com.readingisgood.sale.domain.exception;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 public class BusinessException extends RuntimeException {

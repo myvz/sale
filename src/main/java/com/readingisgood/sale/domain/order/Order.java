@@ -5,6 +5,7 @@ import com.readingisgood.sale.domain.entity.BaseAuditingEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -26,6 +27,9 @@ public class Order extends BaseAuditingEntity {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderLine> orderLines;
 
     @Override
     public boolean equals(Object o) {

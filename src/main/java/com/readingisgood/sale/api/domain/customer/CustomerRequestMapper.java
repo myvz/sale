@@ -16,6 +16,7 @@ public class CustomerRequestMapper {
 
     public CustomerRegisterResponse mapToCustomerResponse(Customer customer) {
         return CustomerRegisterResponse.builder()
+                .id(customer.getId())
                 .name(customer.getName())
                 .lastName(customer.getLastName())
                 .email(customer.getEmail())
